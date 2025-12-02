@@ -27,6 +27,7 @@ struct Action {
 struct State {
   Pos pos;
   Dir dir;
+  auto operator<=>(const State &) const = default;
 
   State(Pos p, Dir d) : pos(p), dir(d) {}
 };

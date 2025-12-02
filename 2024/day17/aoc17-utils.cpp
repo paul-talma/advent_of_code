@@ -31,11 +31,18 @@ int getNum(std::string &line) {
 void getProgram(std::string &line, Program &program) {
   std::regex pattern(R"((\d+),(\d+))");
   std::smatch match;
-  while (std::regex_search(line, match, pattern)) {
-    Name name = static_cast<Name>(matchToInt(match, 0));
-    int input = matchToInt(match, 0);
-    Instruction inst = Instruction(name, input);
-    program.push_back(inst);
+  std::sregex_iterator iter(line.begin(), line.end(), pattern);
+  std::sregex_iterator end;
+  std::string::const_iterator searchStart(line.cbegin());
+
+  while (iter != end) {
+    for (unsigned i = 1; i < iter->size(); i += 2) {
+      Name name = static_cast<Name>(std::stoi((*iter)[i]));
+      int operand = std::stoi((*iter)[i + 1]);
+      Instruction inst = Instruction(name, operand);
+      program.push_back(inst);
+    }
+    ++iter;
   }
 }
 
@@ -62,8 +69,8 @@ void write(int res, Registers &registers, Register reg) {
 
 void jump(int val, InstructionPointer &IP) { IP = val; }
 
-void execute(Instruction &inst, Registers &registers, InstructionPointer &IP,
-             Output &output) {
+void execute(const Instruction &inst, Registers &registers,
+             InstructionPointer &IP, Output &output) {
   Name name = inst.name;
   int operand;
   int res;
@@ -94,8 +101,10 @@ void execute(Instruction &inst, Registers &registers, InstructionPointer &IP,
     IP++;
     break;
   }
+
   case jnz: {
     if (registers[a] == 0) {
+      IP++;
       break;
     }
     jump(inst.operand, IP);
@@ -119,7 +128,7 @@ void execute(Instruction &inst, Registers &registers, InstructionPointer &IP,
 
   case bdv: {
     operand = combo(inst.operand, registers);
-    int num = registers[b];
+    int num = registers[a];
     int div = pow(2, operand);
     res = num / div;
     write(res, registers, b);
@@ -129,7 +138,7 @@ void execute(Instruction &inst, Registers &registers, InstructionPointer &IP,
 
   case cdv: {
     operand = combo(inst.operand, registers);
-    int num = registers[c];
+    int num = registers[a];
     int div = pow(2, operand);
     res = num / div;
     write(res, registers, c);
@@ -139,9 +148,55 @@ void execute(Instruction &inst, Registers &registers, InstructionPointer &IP,
   }
 }
 
-void printOutput(Output &output) {
-  for (int x : output) {
-    std::cout << x << ',';
+void runProgram(const Program &prog, Registers &registers, Output &output) {
+  InstructionPointer IP = 0;
+  int programLength = prog.size();
+  while (IP < programLength) {
+    Instruction inst = prog[IP];
+    execute(inst, registers, IP, output);
   }
-  std::cout << '\n';
+}
+
+std::string formatOutput(Output &output) {
+  std::string out;
+  for (int x : output) {
+    out += std::to_string(x);
+    out.push_back(',');
+  }
+  out.pop_back();
+  return out;
+}
+
+std::string progToString(const Program &prog) {
+  std::string res;
+  for (Instruction inst : prog) {
+    res += std::to_string(inst.name) + std::to_string(inst.operand);
+  }
+  return res;
+}
+
+std::string outputToString(const Output &out) {
+  std::string res;
+  for (int i : out) {
+    res += std::to_string(i);
+  }
+  return res;
+}
+
+int findQuine(const Program &program, Registers &registers) {
+  std::string programString = progToString(program);
+  int regA = 0;
+  while (true) {
+    if (regA % 1000000 == 0) {
+      std::cout << regA << '\n';
+    }
+    registers[a] = regA;
+    Output out;
+    runProgram(program, registers, out);
+    std::string outputString = outputToString(out);
+    if (outputString == programString) {
+      return regA;
+    }
+    regA++;
+  }
 }

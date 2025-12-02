@@ -1,3 +1,2 @@
-# Advent of Code 2024
-
-See [here](https://adventofcode.com/2024/).
+#Advent of Code solutions.
+See [here](https://adventofcode.com/).

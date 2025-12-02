@@ -50,6 +50,7 @@ void getMap(const std::string &path, Map &map, Pos &start_pos, Pos &end_pos) {
         end_pos.x = x_val;
         end_pos.y = y_val;
       }
+      y_val++;
     }
     map.push_back(currLine);
     x_val++;
@@ -57,7 +58,7 @@ void getMap(const std::string &path, Map &map, Pos &start_pos, Pos &end_pos) {
 }
 
 bool clear(const State &state, const Dir &dir) {
-  return map[state.pos.x + dir.x][state.pos.y + dir.y] == '.';
+  return map[state.pos.x + dir.x][state.pos.y + dir.y] != '#';
 }
 
 bool valid(const Action &action, const State &state) {
@@ -77,28 +78,53 @@ State updateState(State &state, const Action &action) {
 }
 
 bool isGoal(State s, Pos end_pos) {
-  int x = s.pos.x;
-  int y = s.pos.y;
-  return (x == end_pos.x) && (y == end_pos.y);
+  return (s.pos.x == end_pos.x) && (s.pos.y == end_pos.y);
 }
 
 int UCS(Pos &start_pos, Pos end_pos) {
   State currState = State(start_pos, E);
-  std::set<Pos> visited;
+  std::set<State> visited;
   PQ pq;
   pq.push(currState, 0);
 
   while (!pq.empty()) {
-    auto [state, cost] = pq.pop();
-    visited.insert(state.pos);
+    auto [currState, cost] = pq.pop();
+    visited.insert(currState);
     for (Action action : actions) {
-      if (valid(action, state)) {
-        State next_state = updateState(state, action);
+      if (valid(action, currState)) {
+        State next_state = updateState(currState, action);
         if (isGoal(next_state, end_pos)) {
           return cost + 1;
         }
-        if (!visited.contains(state.pos)) {
-          int next_cost = cost += action.cost;
+        if (!visited.contains(next_state)) {
+          int next_cost = cost + action.cost;
+          pq.push(next_state, next_cost);
+        }
+      }
+    }
+  }
+  return -1;
+}
+
+int UCS2(Pos &start_pos, Pos end_pos) {
+  State currState = State(start_pos, E);
+  std::set<State> visited;
+  PQ pq;
+  pq.push(currState, 0);
+  bool pathFound = false;
+  unsigned path_cost;
+
+  while (!pq.empty()) {
+    auto [currState, cost] = pq.pop();
+    visited.insert(currState);
+    for (Action action : actions) {
+      if (valid(action, currState)) {
+        State next_state = updateState(currState, action);
+        if ((pathFound = isGoal(next_state, end_pos))) {
+          path_cost = cost + 1;
+        }
+        if (!visited.contains(next_state)) {
+          int next_cost = cost + action.cost;
           pq.push(next_state, next_cost);
         }
       }
@@ -108,7 +134,7 @@ int UCS(Pos &start_pos, Pos end_pos) {
 }
 
 int main() {
-  std::string path = "test.txt";
+  std::string path = "input.txt";
   Pos start_pos;
   Pos end_pos;
 

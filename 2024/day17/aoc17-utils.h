@@ -29,7 +29,8 @@ typedef int InstructionPointer;
 typedef std::vector<int> Registers;
 typedef std::vector<int> Output;
 
-void parseInput(std::string &path, Program &program, Registers &registers);
+void parseInput(const std::string &path, Program &program,
+                Registers &registers);
 
 int getNum(std::string &line);
 void getProgram(std::string &line, Program &program);
@@ -37,6 +38,10 @@ int matchToInt(std::smatch &match, int index);
 int combo(int val, Registers &registers);
 void write(int res, Registers &registers, Register reg);
 void jump(int val, InstructionPointer &IP);
-void execute(Instruction &inst, Registers &registers, InstructionPointer &IP,
-             Output &output);
-void printOutput(Output &output);
+void execute(const Instruction &inst, Registers &registers,
+             InstructionPointer &IP, Output &output);
+void runProgram(const Program &prog, Registers &registers, Output &output);
+std::string formatOutput(Output &output);
+std::string progToString(const Program &prog);
+std::string outputToString(const Output &out);
+int findQuine(const Program &program, Registers &registers);
