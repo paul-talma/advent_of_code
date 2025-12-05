@@ -18,5 +18,13 @@ def read_input_sequence(path='input.txt'):
     return lines
 
 
+def read_input_lines_as_lists(path='input.txt'):
+    caller_path = Path(inspect.stack()[1].filename).parent
+    filepath = caller_path / path
+    with open(filepath, 'r') as f:
+        lines = [list(l.strip()) for l in f.readlines()]
+    return lines
+
+
 def vec_add(v1, v2):
     return (v1[0] + v2[0]), (v1[1] + v2[1])

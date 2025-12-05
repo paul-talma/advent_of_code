@@ -103,7 +103,17 @@ def fetch_aoc_input(year, day):
 
     # script
     script_path = os.path.join(dir_path, f'day{day:02d}.py')
-    Path(script_path).touch()
+    template = """import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
+
+from utils import utils
+
+INPUT = utils.read_input_lines('input.txt')
+"""
+    with open(Path(script_path), 'w') as f:
+        f.write(template)
 
 
 if __name__ == '__main__':
@@ -135,4 +145,3 @@ if __name__ == '__main__':
         sys.exit(1)
 
     fetch_aoc_input(year, day)
-

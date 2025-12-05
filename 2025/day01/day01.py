@@ -5,7 +5,7 @@ sys.path.append(str(Path(__file__).resolve().parents[2]))
 
 from utils import utils
 
-INPUT = utils.read_file('input.txt')
+INPUT = utils.read_input_lines('input.txt')
 INPUT = [(line[0], int(line[1:])) for line in INPUT]
 
 
