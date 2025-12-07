@@ -101,19 +101,13 @@ def fetch_aoc_input(year, day):
     # Fetch and save the test case after fetching the main input
     fetch_test_case(year, day, session_cookie, dir_path)
 
-    # script
-    script_path = os.path.join(dir_path, f'day{day:02d}.py')
-    template = """import sys
-from pathlib import Path
+    make_script(year, day, dir_path)
 
-sys.path.append(str(Path(__file__).resolve().parents[2]))
 
-from utils import utils
-
-INPUT = utils.read_input_lines('input.txt')
-"""
-    with open(Path(script_path), 'w') as f:
-        f.write(template)
+def make_script(year, day, dir_path):
+    filename = f'day{day}.py'
+    filepath = Path(dir_path) / Path(filename)
+    filepath.touch()
 
 
 if __name__ == '__main__':
