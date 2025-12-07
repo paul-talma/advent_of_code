@@ -1,3 +1,6 @@
+# part 1 is in O(n) (unlike naive O(n^2) approach)
+# part 2 is in O(n) (unlike O(factorial) naive recursive approach)
+# thanks to dynamic programming and fixed subsequence length.
 import sys
 from pathlib import Path
 

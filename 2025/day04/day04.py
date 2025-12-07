@@ -1,3 +1,6 @@
+# nothing fancy, just iterate.
+# part two is optimized as items are removed online
+# this can result in speedups by a factor of n
 import sys
 from pathlib import Path
 

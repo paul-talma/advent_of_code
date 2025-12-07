@@ -1,3 +1,4 @@
+# modular arithmetic with careful handling of edge cases
 import sys
 from pathlib import Path
 
@@ -28,13 +29,10 @@ def part1():
 def part2():
     INITIAL = 50
     MAX = 100
-    SIGN_DICT = {'R': 1, 'L': -1}
     val = INITIAL
     counter = 0
-    # __import__('ipdb').set_trace()
     for instruction in INPUT:
         dir = instruction[0]
-        sign = SIGN_DICT[dir]
         displacement = instruction[1]
         if dir == 'L':
             val = (MAX - val) % MAX
